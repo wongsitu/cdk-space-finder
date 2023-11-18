@@ -12,29 +12,28 @@ interface LambdaStackProps extends StackProps {
 }
 
 export class LambdaStack extends Stack {
-  public readonly helloLambdaIntegration: LambdaIntegration
+  public readonly spacesLambdaIntegration: LambdaIntegration
 
   constructor(scope: Construct, id: string, props: LambdaStackProps) {
     super(scope, id, props)
 
-    const helloLambda = new NodejsFunction(this, 'HelloLambda', {
+    const spacesLambda = new NodejsFunction(this, 'HelloLambda', {
       runtime: Runtime.NODEJS_18_X,
       handler: 'handler',
-      entry: join(__dirname, '..', '..', 'services', 'hello.ts'),
+      entry: join(__dirname, '..', '..', 'services', 'spaces', 'handler.ts'),
       environment: {
-        SPACES_TABLE_NAME: props.spacesTable.tableName,
+        TABLE_NAME: props.spacesTable.tableName,
       },
     })
 
-    helloLambda.addToRolePolicy(new PolicyStatement({
+    spacesLambda.addToRolePolicy(new PolicyStatement({
       effect: Effect.ALLOW,
       actions: [
-        's3:ListAllMyBuckets',
-        's3:ListBucket'
+        'dynamodb:PutItem'
       ],
-      resources: ['*']
+      resources: [props.spacesTable.tableArn]
     }))
 
-    this.helloLambdaIntegration = new LambdaIntegration(helloLambda)
+    this.spacesLambdaIntegration = new LambdaIntegration(spacesLambda)
   }
 }

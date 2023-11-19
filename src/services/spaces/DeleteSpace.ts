@@ -3,24 +3,24 @@ import { marshall } from "@aws-sdk/util-dynamodb";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
 export const deleteSpace = async (event: APIGatewayProxyEvent, ddbClient: DynamoDBClient): Promise<APIGatewayProxyResult> => {
-  if (event.queryStringParameters && ('id' in event.queryStringParameters)) {
-    const spaceId = event.queryStringParameters.id;
-
-    const deleteResult = await ddbClient.send(new DeleteItemCommand({
-      TableName: process.env.TABLE_NAME,
-      Key: marshall({
-        id: spaceId
-      }),
-    }))
-
+  if (!event.queryStringParameters?.id) {
     return {
-      statusCode: 200,
-      body: JSON.stringify(deleteResult.Attributes)
+      statusCode: 422,
+      body: 'Missing id'
     }
   }
-  
+
+  const spaceId = event.queryStringParameters.id;
+
+  const deleteResult = await ddbClient.send(new DeleteItemCommand({
+    TableName: process.env.TABLE_NAME,
+    Key: marshall({
+      id: spaceId
+    }),
+  }))
+
   return {
-    statusCode: 400,
-    body: JSON.stringify('Please provide right arguments')
+    statusCode: 200,
+    body: JSON.stringify(deleteResult)
   }
 }

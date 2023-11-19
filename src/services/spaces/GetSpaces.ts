@@ -1,6 +1,6 @@
 import { DynamoDBClient, GetItemCommand, ScanCommand } from "@aws-sdk/client-dynamodb";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { unmarshall } from "@aws-sdk/util-dynamodb";
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
 export const getSpaces = async (event: APIGatewayProxyEvent, ddbClient: DynamoDBClient): Promise<APIGatewayProxyResult> => {
   if (event.queryStringParameters) {
@@ -8,9 +8,9 @@ export const getSpaces = async (event: APIGatewayProxyEvent, ddbClient: DynamoDB
       const spaceId = event.queryStringParameters.id
       const getItemResponse = await ddbClient.send(new GetItemCommand({
         TableName: process.env.TABLE_NAME,
-        Key: {
-          id: { S: spaceId }
-        }
+        Key: marshall({
+          id: spaceId
+        })
       }))
       if (getItemResponse.Item) {
         const unmarshalledItem = unmarshall(getItemResponse.Item)
@@ -40,8 +40,7 @@ export const getSpaces = async (event: APIGatewayProxyEvent, ddbClient: DynamoDB
     TableName: process.env.TABLE_NAME,
   }))
 
-  console.log(result.Items)
-  const unmarshalledItems = result.Items.map(item => unmarshall(item))
+  const unmarshalledItems = result.Items?.map(item => unmarshall(item))
 
   return {
     statusCode: 200,

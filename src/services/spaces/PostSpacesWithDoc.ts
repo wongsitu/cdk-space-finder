@@ -4,6 +4,14 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { v4 } from "uuid";
 
 export const postSpaces = async (event: APIGatewayProxyEvent, ddbClient: DynamoDBClient): Promise<APIGatewayProxyResult> => {
+  if (!event.body) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: 'Missing body'
+      })
+    }
+  }
   const ddbDocClient = DynamoDBDocumentClient.from(ddbClient)
   const randomId = v4()
   const item = JSON.parse(event.body)

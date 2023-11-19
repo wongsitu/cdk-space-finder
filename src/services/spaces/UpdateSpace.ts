@@ -1,6 +1,6 @@
-import { DynamoDBClient, GetItemCommand, ScanCommand, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
+import { marshall } from "@aws-sdk/util-dynamodb";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 export const updateSpace = async (event: APIGatewayProxyEvent, ddbClient: DynamoDBClient): Promise<APIGatewayProxyResult> => {
   if (event.queryStringParameters && ('id' in event.queryStringParameters) && event.body ) {
@@ -11,9 +11,9 @@ export const updateSpace = async (event: APIGatewayProxyEvent, ddbClient: Dynamo
 
     const updateResult = await ddbClient.send(new UpdateItemCommand({
       TableName: process.env.TABLE_NAME,
-      Key: {
-        id: { S: spaceId }
-      },
+      Key: marshall({
+        id: spaceId
+      }),
       UpdateExpression: `set #zzzNew = :new`,
       ExpressionAttributeValues: {
         ':new': { S: requestBodyValue }

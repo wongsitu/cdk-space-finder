@@ -1,4 +1,4 @@
-import { v4 } from 'uuid'
+import { randomUUID } from 'crypto'
 import { z } from 'zod'
 
 export const PostSchema = z.object({
@@ -9,7 +9,9 @@ export const PostSchema = z.object({
 
 export const CreatePostSchema = PostSchema.transform((data) => ({
   ...data,
-  id: v4(),
+  id: randomUUID(),
 }))
 
 export const UpdatePostSchema = PostSchema.partial()
+
+export class JSONError extends Error {}

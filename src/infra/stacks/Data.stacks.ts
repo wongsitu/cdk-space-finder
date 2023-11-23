@@ -12,12 +12,22 @@ export class DataStack extends Stack {
 
     const suffix = getSuffixFromStack(this)
 
-    this.spacesTable = new Table(this, 'SpacesTable', {
+    const spacesTable = new Table(this, 'SpacesTable', {
       partitionKey: {
         name: 'id',
         type: AttributeType.STRING,
       },
       tableName: `SpaceTable-${suffix}`,
     })
+
+    // spacesTable.addGlobalSecondaryIndex({
+    //   indexName: 'GS1',
+    //   partitionKey: {
+    //     name: 'name',
+    //     type: AttributeType.STRING,
+    //   },
+    // })
+
+    this.spacesTable = spacesTable
   }
 }

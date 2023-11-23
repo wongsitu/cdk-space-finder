@@ -122,7 +122,7 @@ export class AuthStack extends Stack {
     adminRole.addToPolicy(new PolicyStatement({
       effect: Effect.ALLOW,
       actions: [
-        's3:ListAllMyBucket',
+        's3:ListAllMyBuckets',
       ],
       resources: ['*'],
     }))

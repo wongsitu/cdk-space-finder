@@ -4,6 +4,8 @@ import { fromCognitoIdentityPool } from '@aws-sdk/credential-providers';
 import { Amplify, Auth } from 'aws-amplify';
 import { AuthStack } from '../outputs.json';
 
+require('dotenv').config()
+
 Amplify.configure({
     Auth: {
         region: process.env.AWS_REGION,

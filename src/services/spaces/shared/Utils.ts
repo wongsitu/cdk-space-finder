@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { JSONError } from "./Validators";
 
 export function parseJSON<T>(json: string): T {
@@ -17,4 +17,12 @@ export function hasAdminGroup(event: APIGatewayProxyEvent) {
   }
 
   return (groups as string).includes('admins')
+}
+
+export function addCORSHeaders(arg: APIGatewayProxyResult) {
+  if (!arg.headers) {
+    arg.headers = {}
+  }
+  arg.headers['Access-Control-Allow-Origin'] = '*'
+  arg.headers['Access-Control-Allow-Methods'] = '*'
 }

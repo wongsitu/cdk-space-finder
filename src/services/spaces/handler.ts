@@ -4,25 +4,36 @@ import { postSpaces } from "./PostSpaces";
 import { getSpaces } from "./GetSpaces";
 import { updateSpace } from "./UpdateSpace";
 import { deleteSpace } from "./DeleteSpace";
+import { addCORSHeaders } from "./shared/Utils";
 
 const ddbClient = new DynamoDBClient({});
 
 async function handler(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult>{
+  let response: APIGatewayProxyResult | undefined
+  
   try {
     switch (event.httpMethod) {
       case 'GET':
         const getResponse = await getSpaces(event, ddbClient);
-        return getResponse
+        response = getResponse
+        break
       case 'POST':
         const postResponse = await postSpaces(event, ddbClient);
-        return postResponse
+        response = postResponse
+        break
       case 'PUT':
-        const putResponse = await updateSpace(event, ddbClient);
-        return putResponse
+        const updateResponse = await updateSpace(event, ddbClient);
+        response = updateResponse
+        break
       case 'DELETE':
         const deleteResponse = await deleteSpace(event, ddbClient);
-        return deleteResponse
+        response = deleteResponse
+        break
       default:
+        response = {
+          statusCode: 422,
+          body: JSON.stringify('Unprocessable Entity')
+        }
         break;
     }
   } catch (error: any) {
@@ -31,11 +42,9 @@ async function handler(event: APIGatewayProxyEvent, context: Context): Promise<A
       body: JSON.stringify(error.message)
     };
   }
-  
-  return {
-    statusCode: 422,
-    body: 'Unprocessable Entity'
-  };
+
+  addCORSHeaders(response);
+  return response;
 }
 
 export { handler };
